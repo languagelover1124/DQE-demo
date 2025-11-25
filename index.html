@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>DQE Demo – getrennte Darstellung</title>
+<title>DQE Demo – Panels + Legende</title>
 <style>
 body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
 .container { display: flex; gap: 20px; align-items:flex-start; }
@@ -20,6 +20,23 @@ textarea { width: 100%; height: 140px; margin-bottom: 10px; }
 button { margin:4px; padding:6px 10px; border:none; border-radius:6px; cursor:pointer; }
 button.uebernehmen { background:green; color:white; }
 button.rueck       { background:orange; color:white; }
+
+/* Legende */
+.legend {
+  margin-top: 30px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 600px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.legend h3 { margin-top: 0; }
+.legend-item { display: flex; align-items: center; margin-bottom: 8px; }
+.legend-badge { width: 24px; height: 24px; border-radius: 6px; margin-right: 10px; }
+.legend-badge.gruen { background: green; }
+.legend-badge.gelb  { background: orange; }
+.legend-badge.rot   { background: red; }
 </style>
 </head>
 <body>
@@ -78,13 +95,27 @@ macht doch einfach einen Fünfer gerade sein.“
   </div>
 </div>
 
+<!-- Legende unter den Panels -->
+<div class="legend">
+  <h3>Legende – Ampelbewertung</h3>
+  <div class="legend-item">
+    <div class="legend-badge gruen"></div>
+    <span><strong>Grün:</strong> Sicher – Übersetzung korrekt und direkt nutzbar.</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-badge gelb"></div>
+    <span><strong>Gelb:</strong> Unsicher – teilweise korrekt, aber mit Vorsicht verwenden.</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-badge rot"></div>
+    <span><strong>Rot:</strong> Riskant – kann falsch oder unpassend sein.Nicht verwenden für wichtige Inhalte – ggf. grobe Orientierung, aber mit Vorsicht.</span>
+  </div>
+</div>
+ 
 <script>
 function showBadgeOverlay(id) {
-  // Alle Badge-Overlays schließen
   document.querySelectorAll('[id^="overlay-badge"]').forEach(el => el.style.display = "none");
-  // Gewähltes Overlay öffnen
   document.getElementById("overlay-" + id).style.display = "block";
-  // Markierungs-Overlay schließen
   document.getElementById("overlay-mark").style.display = "none";
 }
 function showMarkOverlay() {
