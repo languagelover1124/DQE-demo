@@ -1,141 +1,274 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>DQE Demo – Panels + Legende</title>
+<meta charset="UTF-8" />
+<title>Ampel-Prototyp – Ausgangstext & Übersetzung</title>
 <style>
-body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
-.container { display: flex; gap: 20px; align-items:flex-start; }
-.panel { flex: 1; background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-textarea { width: 100%; height: 140px; margin-bottom: 10px; }
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; padding: 16px; line-height: 1.6; }
+  h3, h4 { margin: 0.5rem 0; }
+  .section { margin-bottom: 16px; }
 
-.overall-badge { display:inline-block; padding:6px 10px; border-radius:6px; font-weight:bold; color:#fff; margin-bottom:10px; cursor:pointer; }
-.gruen { background:green; }
-.rot   { background:red; }
+  /* Zwei Fenster nebeneinander */
+  .side-by-side { display: flex; gap: 16px; max-width: 100%; }
+  .editable {
+    flex: 1; border: 2px solid #ccc; border-radius: 8px; padding: 1rem;
+    min-height: 320px; overflow-y: auto; background: #fafafa;
+  }
+  .editable:focus { outline: none; border-color: #228b22; background: #fff; }
 
-.mark { cursor:pointer; border-radius:3px; padding:2px 4px; }
-.mark.rot { background-color:#ffe6e6; border-bottom:2px dashed red; }
+  /* Ampel-Badges */
+  .ampel-badges { margin-bottom: 8px; }
+  .badge {
+    border: none; color: white; padding: 0.5rem 1rem; margin: 0.25rem;
+    border-radius: 6px; cursor: pointer; font-weight: 600;
+  }
+  .badge.gruen { background: #228b22; }
+  .badge.gelb  { background: #ffd700; }
+  .badge.rot   { background: #c62828; }
 
-.overlay-box { background:#f9f9f9; border-left:6px solid; padding:1rem; border-radius:8px; margin-top:10px; display:none; }
-button { margin:4px; padding:6px 10px; border:none; border-radius:6px; cursor:pointer; }
-button.uebernehmen { background:green; color:white; }
-button.rueck       { background:orange; color:white; }
+  /* Overlays */
+  .overlay-box {
+    background: #f9f9f9; border-left: 6px solid; padding: 1rem; border-radius: 8px;
+    max-width: 720px; margin: 0.75rem 0;
+  }
+  #overlay-gruen { border-color: #228b22; }
+  #overlay-gelb  { border-color: #ffd700; }
+  #overlay-rot   { border-color: #c62828; }
+  .hidden { display: none; }
 
-/* Legende */
-.legend {
-  margin-top: 30px;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 16px;
-  max-width: 600px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-.legend h3 { margin-top: 0; }
-.legend-item { display: flex; align-items: center; margin-bottom: 8px; }
-.legend-badge { width: 24px; height: 24px; border-radius: 6px; margin-right: 10px; }
-.legend-badge.gruen { background: green; }
-.legend-badge.gelb  { background: orange; }
-.legend-badge.rot   { background: red; }
+  /* Segment-Markierungen */
+  .mark { cursor: pointer; border-radius: 3px; padding: 0 2px; }
+  .mark.gruen { background-color: #e6ffe6; border-bottom: 2px solid #228b22; }
+  .mark.gelb  { background-color: #ffffe0; border-bottom: 2px dashed #ffd700; }
+  .mark.rot   { background-color: #ffe6e6; border-bottom: 2px dashed #c62828; }
+
+  /* Gesamtbewertung (inline hinter Überschrift) */
+  .overall-badge {
+    margin-left: 12px; padding: 0.2rem 0.6rem; font-weight: 600; border-radius: 6px; display: inline-block;
+  }
+  .overall-badge.gruen { background: #228b22; color: white; }
+  .overall-badge.gelb  { background: #ffd700; color: black; }
+  .overall-badge.rot   { background: #c62828; color: white; }
+
+  /* Hilfe-Box */
+  .help-box {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #fff; border: 2px solid #ccc; padding: 1rem; border-radius: 12px;
+    max-width: 640px; box-shadow: 0 8px 24px rgba(0,0,0,0.18); z-index: 1000;
+  }
+  .help-box-header { display:flex; justify-content:space-between; align-items:center; }
+  .help-box .close { cursor: pointer; font-size: 20px; font-weight: bold; line-height: 1; }
+  .help-box button {
+    margin-top: 0.5rem; padding: 0.4rem 0.8rem; border: none; border-radius: 4px; background: #eee; cursor: pointer;
+  }
+  .help-box button:hover { background: #ddd; }
 </style>
 </head>
 <body>
 
-<h2>DQE Übersetzungseinschätzung</h2>
-
-<div class="container">
-  <!-- Beispiel 1 -->
-  <div class="panel">
-    <h3>Beispiel 1 – Kurdisch → Deutsch</h3>
-    <textarea readonly>
-Roja îro gelek xweş bû. Ez çûme bazarê û hemû tiştên hewce kirîn. 
-Di rê de, min bi hevalekî kevn re rast hat ku ji bo demekê dirêj nedîtibûm. 
-Me li çayxaneyekê rûnişt û bi kêf li ser kevn û nû talkirin.
-    </textarea>
-    <textarea readonly>
-Heute war ein sehr schöner Tag. Ich ging auf den Markt und kaufte alle notwendigen Dinge. 
-Unterwegs traf ich einen alten Freund, den ich lange nicht gesehen hatte. 
-Wir setzten uns in ein Café und unterhielten uns fröhlich über alte und neue Dinge.
-    </textarea>
-    <div class="overall-badge gruen" onclick="showBadgeOverlay('badge1')">🟢 Sicher – Verlässlich</div>
-    <div id="overlay-badge1" class="overlay-box">
-      <strong>Risiko:</strong> sehr niedrig<br>
-      <strong>Bedeutung:</strong> korrekt und verständlich.<br>
-      <strong>Handlungsempfehlung:</strong> Direkt nutzbar, keine weitere Prüfung nötig.
-    </div>
+<!-- Ampelsteuerung und Overlays -->
+<div class="section">
+  <div class="ampel-badges">
+    <button class="badge gruen" onclick="openOverlay('gruen')">🟢 Sicher</button>
+    <button class="badge gelb" onclick="openOverlay('gelb')">🟡 Unsicher</button>
+    <button class="badge rot" onclick="openOverlay('rot')">🔴 Riskant</button>
   </div>
 
-  <!-- Beispiel 2 -->
-  <div class="panel">
-    <h3>Beispiel 2 – Deutsch → Englisch</h3>
-    <textarea readonly>
-„Das ist ja ein dicker Hund!“ rief der Manager nach der Präsentation. 
-„Wir müssen das unbedingt bis zum nächsten Meeting auf die Reihe kriegen, 
-sonst geht uns der Saft aus. Ich brauche eure Inputs bis Freitag – 
-macht doch einfach einen Fünfer gerade sein.“
-    </textarea>
-    <p>
-      "<span class="mark rot" onclick="showMarkOverlay()">That's a big dog!</span>" shouted the manager after the presentation.  
-      "We absolutely have to get it together until the next meeting, otherwise we'll run out of juice.  
-      I need your inputs by Friday – just make a fiver straight."
-    </p>
-    <div class="overall-badge rot" onclick="showBadgeOverlay('badge2')">🔴 Riskant – Nicht vertrauenswürdig</div>
-    <div id="overlay-badge2" class="overlay-box">
-      <strong>Risiko:</strong> hoch<br>
-      <strong>Bedeutung:</strong> Idiome wurden wörtlich übersetzt und sind im Englischen unverständlich.<br>
-      <strong>Handlungsempfehlung:</strong> Nicht vertrauenswürdig – professionelle Nachbearbeitung nötig.
-    </div>
-    <div id="overlay-mark" class="overlay-box">
-      <strong>Problemstelle:</strong> „That's a big dog!“<br><br>
-      <strong>Vorschlag:</strong> "That's unbelievable!"<br><br>
-      <button class="uebernehmen" onclick="applySuggestion()">Übernehmen</button>
-      <button class="rueck" onclick="showBackTranslation()">Rückübersetzung</button>
-      <p id="backtranslation" style="margin-top:10px; display:none; color:#555;"></p>
-    </div>
+  <div id="overlay-gruen" class="overlay-box hidden">
+    <h3>🟢 Übersetzung – Verlässlich</h3>
+    <p>Übersetzung ist verlässlich. Sie können den Text direkt verwenden.</p>
+  </div>
+
+  <div id="overlay-gelb" class="overlay-box hidden">
+    <h3>🟡 Übersetzung – Verbesserungsbedürftig</h3>
+    <p>Übersetzung ist verständlich, aber nicht perfekt. Mit Vorsicht verwenden – bei wichtigen Inhalten professionelle Hilfe empfohlen.</p>
+  </div>
+
+  <div id="overlay-rot" class="overlay-box hidden">
+    <h3>🔴 Übersetzung – Nicht vertrauenswürdig</h3>
+    <p><strong>Qualitätseinschätzung:</strong> Niedrig</p>
+    <p><strong>Risiko:</strong> Hoch (falsche Bedeutungen, unprofessionelle Tonalität)</p>
+    <p><strong>Empfehlung für Laien:</strong> Für wichtige Inhalte bitte nicht verwenden; für grobe Orientierung nur mit Vorsicht.</p>
   </div>
 </div>
 
-<!-- Legende unter den Panels -->
-<div class="legend">
-  <h3>Legende – Ampelbewertung</h3>
-  <div class="legend-item">
-    <div class="legend-badge gruen"></div>
-    <span><strong>Grün:</strong> Sicher – Übersetzung korrekt und direkt nutzbar.</span>
+<!-- Zwei Fenster nebeneinander -->
+<div class="side-by-side">
+  <div id="source-pane" class="editable" contenteditable="true">
+    <h4>Ausgangstext</h4>
+    „Das ist ja ein dicker Hund!“ rief der Manager nach der Präsentation. „Wir müssen das unbedingt bis zum nächsten Meeting auf die Reihe kriegen, sonst geht uns der Saft aus. Ich brauche eure Inputs bis Freitag – macht doch einfach einen Fünfer gerade sein.“<br><br>
+    Unser neues Produkt ist eigentlich eine eierlegende Wollmilchsau, aber das Marketing hat es total versalzen. Jetzt sitzen wir auf dem Trockenen und der Chef ist stocksauer. Wir sollten nicht aus der Haut fahren, sondern die Kirche im Dorf lassen.<br><br>
+    Ach ja, und denkt an den Datenschutz – das ist doch Ehrensache! Wir wollen ja nicht in die Bredouille kommen wie die Kollegen aus dem letzten Quartal. Die haben nämlich den Rubel rollen lassen, ohne an die Rechtslage zu denken.
   </div>
-  <div class="legend-item">
-    <div class="legend-badge gelb"></div>
-    <span><strong>Gelb:</strong> Unsicher – teilweise korrekt, aber mit Vorsicht verwenden.</span>
-  </div>
-  <div class="legend-item">
-    <div class="legend-badge rot"></div>
-    <span><strong>Rot:</strong> Riskant – kann falsch oder unpassend sein. <br>Nicht verwenden für wichtige Inhalte – ggf. grobe Orientierung, aber mit Vorsicht.<br></span>
+
+  <div id="target-pane" class="editable" contenteditable="true">
+    <h4>Zieltext 
+      <span id="overall-score" class="overall-badge">Gesamtbewertung: 🔴 Rot</span>
+    </h4>
+    "<span class="mark rot" data-key="hund">That's a big dog!</span>" shouted the manager after the presentation.
+    "We absolutely have to get this done by the next meeting, otherwise <span class="mark rot" data-key="juice">we'll run out of juice</span>.
+    I need your <span class="mark rot" data-key="inputs">inputs</span> by Friday – <span class="mark rot" data-key="fiver">just make a fiver straight</span>."
+    Our new product is actually a <span class="mark gelb" data-key="jack">jack-of-all-trades</span>, but marketing has totally <span class="mark gelb" data-key="spoiled">spoiled it</span>.
+    Now we're <span class="mark rot" data-key="dry">sitting on dry land</span> and the boss is.
+    We should not <span class="mark rot" data-key="skin">get out of our skin</span>, but <span class="mark rot" data-key="church">leave the church in the village</span>.
+    Oh yes, and think about <span class="mark gruen" data-key="dataprotection">data protection</span> – that's <span class="mark gruen" data-key="honor">a matter of honor</span>!
+    We don't want to <span class="mark gelb" data-key="predicament">get into a predicament</span> like our colleagues from last quarter.
+    They <span class="mark rot" data-key="ruble">let the ruble roll</span> without thinking about the legal situation.
   </div>
 </div>
- 
+
+<!-- Hilfe-Box -->
+<div id="help-box" class="help-box hidden">
+  <div class="help-box-header">
+    <h4 id="help-title"></h4>
+    <span class="close" onclick="closeHelp()">×</span>
+  </div>
+  <p id="help-problem"></p>
+  <div id="help-suggestions"></div>
+</div>
+
 <script>
-function showBadgeOverlay(id) {
-  document.querySelectorAll('[id^="overlay-badge"]').forEach(el => el.style.display = "none");
-  document.getElementById("overlay-" + id).style.display = "block";
-  document.getElementById("overlay-mark").style.display = "none";
+/* Overlays steuern */
+function openOverlay(level) {
+  document.querySelectorAll('.overlay-box').forEach(o => o.classList.add('hidden'));
+  const el = document.getElementById('overlay-' + level);
+  if (el) el.classList.remove('hidden');
 }
-function showMarkOverlay() {
-  document.getElementById("overlay-mark").style.display = "block";
-  document.querySelectorAll('[id^="overlay-badge"]').forEach(el => el.style.display = "none");
-}
-function applySuggestion() {
-  const mark = document.querySelector(".mark.rot");
-  if (mark) {
-    mark.textContent = "That's unbelievable!";
-    mark.classList.remove("rot");
-  }
-  document.getElementById("overlay-mark").style.display = "none";
-}
-function showBackTranslation() {
-  const back = document.getElementById("backtranslation");
-  back.textContent = "Rückübersetzung: „Das ist ja unglaublich!“";
-  back.style.display = "block";
-}
-</script>
 
+document.addEventListener('DOMContentLoaded', () => {
+  /* Rückübersetzungen */
+  const backTranslations = {
+    hund: "Das ist ja ein dicker Hund!",
+    juice: "… sonst geht uns der Saft aus.",
+    inputs: "Inputs",
+    fiver: "macht doch einfach einen Fünfer gerade sein.",
+    jack: "eierlegende Wollmilchsau",
+    spoiled: "versalzen",
+    dry: "auf dem Trockenen sitzen",
+    skin: "aus der Haut fahren",
+    church: "die Kirche im Dorf lassen",
+    dataprotection: "Datenschutz",
+    honor: "Ehrensache",
+    predicament: "in die Bredouille kommen",
+    ruble: "den Rubel rollen lassen"
+  };
+
+  /* Vorschläge für bessere Übersetzungen */
+  const suggestions = {
+    hund: "That's outrageous!",
+    juice: "otherwise we'll run out of steam",
+    inputs: "feedback",
+    fiver: "just let it slide",
+    jack: "all-rounder",
+    spoiled: "messed it up",
+    dry: "left high and dry",
+    skin: "lose our temper",
+    church: "keep things in perspective",
+    dataprotection: "data protection",
+    honor: "matter of principle",
+    predicament: "get into trouble",
+    ruble: "splashed the cash"
+  };
+
+  /* Hilfe-Box Referenzen */
+  const helpBox = document.getElementById('help-box');
+  const helpTitle = document.getElementById('help-title');
+  const helpProblem = document.getElementById('help-problem');
+  const helpSuggestions = document.getElementById('help-suggestions');
+  const targetPane = document.getElementById('target-pane');
+
+  /* Button-Hilfsfunktion */
+  function addSuggestionButton(mark, suggestion) {
+    const btn = document.createElement('button');
+    btn.textContent = "✅ Vorschlag übernehmen";
+    btn.addEventListener('click', () => {
+      mark.textContent = suggestion;
+      mark.classList.remove('rot','gelb');
+      mark.classList.add('gruen');
+      calculateOverallScore();
+      closeHelp();
+    });
+    helpSuggestions.appendChild(btn);
+  }
+
+  /* Gesamtbewertung berechnen */
+  function calculateOverallScore() {
+    const marks = document.querySelectorAll('#target-pane .mark');
+    let score = 0, total = 0;
+    marks.forEach(m => {
+      total++;
+      if (m.classList.contains('gelb')) score += 1;
+      if (m.classList.contains('rot')) score += 3;
+    });
+    const badge = document.getElementById('overall-score');
+    badge.classList.remove('gruen','gelb','rot');
+    if (score === 0) {
+      badge.textContent = "Gesamtbewertung: 🟢 Sicher";
+      badge.classList.add('gruen');
+      openOverlay('gruen');
+    } else if (score <= Math.max(2, Math.round(0.25 * total))) {
+      badge.textContent = "Gesamtbewertung: 🟡 Unsicher";
+      badge.classList.add('gelb');
+      openOverlay('gelb');
+    } else {
+      badge.textContent = "Gesamtbewertung: 🔴 Riskant";
+      badge.classList.add('rot');
+      openOverlay('rot');
+    }
+  }
+
+  /* Initiale Berechnung */
+  calculateOverallScore();
+
+  /* Event-Delegation für Klicks auf markierte Segmente */
+  targetPane.addEventListener('click', (evt) => {
+    const mark = evt.target.closest('.mark');
+    if (!mark) return;
+
+    const key = mark.dataset.key;
+    const back = backTranslations[key] || "(keine Rückübersetzung verfügbar)";
+    const suggestion = suggestions[key] || "(kein Vorschlag verfügbar)";
+
+    helpTitle.textContent = "Stelle: " + mark.textContent.trim();
+    helpSuggestions.innerHTML = ""; // reset
+    helpProblem.textContent = "";   // reset
+
+    // Inhalte abhängig von der Ampel-Farbe
+    if (mark.classList.contains('gruen')) {
+      helpProblem.textContent = "🟢 Keine Probleme erkannt – direkt verwendbar.";
+      helpSuggestions.innerHTML = `<div><strong>Rückübersetzung:</strong> ${back}</div>`;
+    } else if (mark.classList.contains('gelb')) {
+      helpProblem.textContent = "🟡 Problem: Idiomatik/Stil – Nuance nicht vollständig getroffen.";
+      helpSuggestions.innerHTML = `
+        <div><strong>Rückübersetzung:</strong> ${back}</div>
+        <div><strong>Vorschlag:</strong> ${suggestion}</div>
+      `;
+      addSuggestionButton(mark, suggestion);
+    } else if (mark.classList.contains('rot')) {
+      helpProblem.textContent = "🔴 Problem: Fehlübertragung/Kalk – nicht vertrauenswürdig.";
+      helpSuggestions.innerHTML = `
+        <div><strong>Rückübersetzung:</strong> ${back}</div>
+        <div><strong>Vorschlag:</strong> ${suggestion}</div>
+        <div style="margin-top:8px;">⚠️ Empfehlung: Nur für grobe Orientierung nutzbar; für wichtige Inhalte professionelle Hilfe.</div>
+      `;
+      addSuggestionButton(mark, suggestion);
+    } else {
+      helpProblem.textContent = "ℹ️ Unklassifiziertes Segment.";
+      helpSuggestions.innerHTML = `<div><strong>Rückübersetzung:</strong> ${back}</div>`;
+    }
+
+    // Box sichtbar machen
+    helpBox.classList.remove('hidden');
+  });
+
+  /* Hilfe-Box schließen (für das ×) */
+  window.closeHelp = () => helpBox.classList.add('hidden');
+
+  /* Neu berechnen, wenn Zieltext editiert wird */
+  targetPane.addEventListener('input', () => {
+    calculateOverallScore();
+  });
+});
+</script>
 </body>
 </html>
