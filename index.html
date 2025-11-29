@@ -42,7 +42,7 @@
   .mark.gelb  { background-color: #ffffe0; border-bottom: 2px dashed #ffd700; }
   .mark.rot   { background-color: #ffe6e6; border-bottom: 2px dashed #c62828; }
 
-  /* Gesamtbewertung (inline hinter Überschrift) */
+  /* Gesamteinschätzung (inline hinter Überschrift) */
   .overall-badge {
     margin-left: 12px; padding: 0.2rem 0.6rem; font-weight: 600; border-radius: 6px; display: inline-block;
   }
@@ -103,7 +103,7 @@
 
   <div id="target-pane" class="editable" contenteditable="true">
     <h4>Zieltext 
-      <span id="overall-score" class="overall-badge">Gesamtbewertung: 🔴 Rot</span>
+      <span id="overall-score" class="overall-badge">Gesamteinschätzung: 🔴 Rot</span>
     </h4>
     "<span class="mark rot" data-key="hund">That's a big dog!</span>" shouted the manager after the presentation.
     "We absolutely have to get this done by the next meeting, otherwise <span class="mark rot" data-key="juice">we'll run out of juice</span>.
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
     helpSuggestions.appendChild(btn);
   }
 
-  /* Gesamtbewertung berechnen */
+  /* Gesamteinschätzung berechnen */
   function calculateOverallScore() {
     const marks = document.querySelectorAll('#target-pane .mark');
     let score = 0, total = 0;
@@ -203,15 +203,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const badge = document.getElementById('overall-score');
     badge.classList.remove('gruen','gelb','rot');
     if (score === 0) {
-      badge.textContent = "Gesamtbewertung: 🟢 Sicher";
+      badge.textContent = "Gesamteinschätzung: 🟢 Sicher";
       badge.classList.add('gruen');
       openOverlay('gruen');
     } else if (score <= Math.max(2, Math.round(0.25 * total))) {
-      badge.textContent = "Gesamtbewertung: 🟡 Unsicher";
+      badge.textContent = "Gesamteinschätzung: 🟡 Unsicher";
       badge.classList.add('gelb');
       openOverlay('gelb');
     } else {
-      badge.textContent = "Gesamtbewertung: 🔴 Riskant";
+      badge.textContent = "Gesamteinschätzung: 🔴 Riskant";
       badge.classList.add('rot');
       openOverlay('rot');
     }
